@@ -1,0 +1,24 @@
+- hosts: localhost
+  connection: local
+
+  vars:
+    nvm_script_version: 0.35.3
+    nodejs_version: 14.10
+  tasks:
+
+    -   name: Fetch NVM
+        get_url:
+            url: https://raw.githubusercontent.com/nvm-sh/nvm/v{{ nvm_script_version }}/install.sh
+            dest: /tmp/install_nvm.sh
+      
+    -   name: Install nvm
+        shell: bash /tmp/install_nvm.sh
+        args:
+            creates: "{{ ansible_env.HOME }}/.nvm/nvm.sh"
+
+    -   name: Install Node.js
+        shell: 'source {{ ansible_env.HOME }}/.nvm/nvm.sh && nvm install {{ nodejs_version }} && nvm alias default {{ nodejs_version }}'
+        args:
+            creates: "{{ ansible_env.HOME }}/.nvm/versions/node"
+            chdir: "{{ ansible_env.HOME }}"
+            executable: /bin/bash
